@@ -114,27 +114,34 @@ async function onStart() {
 
   initThree();
 
+  // Overlay must be visible (not display:none) before passing as domOverlay root
+  const overlay = document.getElementById('arOverlay');
+  overlay.hidden = false;
+  overlay.style.opacity = '0';
+
   try {
     xrSession = await navigator.xr.requestSession('immersive-ar', {
-      requiredFeatures: [],
       optionalFeatures: ['hit-test', 'dom-overlay'],
-      domOverlay: { root: document.getElementById('arOverlay') },
+      domOverlay: { root: overlay },
     });
-  } catch {
+  } catch (err) {
+    overlay.hidden = true;
+    overlay.style.opacity = '';
     cleanupThree();
-    startPreview();
+    setNote(`Could not start AR: ${err?.message || err}. Try Chrome on Android or Safari on iOS 16.4+.`);
     return;
   }
+
+  overlay.style.opacity = '';
 
   renderer.xr.setReferenceSpaceType('local');
   await renderer.xr.setSession(xrSession);
   xrSession.addEventListener('end', onSessionEnd);
 
-  // hit-test is optional — works on ARCore/ARKit, skips gracefully if not supported
   try {
     const viewerSpace = await xrSession.requestReferenceSpace('viewer');
     hitTestSource = await xrSession.requestHitTestSource({ space: viewerSpace });
-  } catch { /* hit-test unavailable — tap placement falls back to fixed distance */ }
+  } catch { /* hit-test unavailable — tap places at fixed distance */ }
 
   showARUI(selectedModel.name);
   renderer.domElement.addEventListener('click', onARTap);
@@ -291,10 +298,8 @@ function buildADUModel(config) {
 
 // ── UI helpers ─────────────────────────────────────────────────────────────────
 function showARUI(modelName) {
-  document.getElementById('home').hidden         = false;
-  document.getElementById('home').style.display  = 'none';
-  const overlay = document.getElementById('arOverlay');
-  overlay.hidden = false;
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('arOverlay').hidden   = false;
   document.getElementById('arModelName').textContent = modelName;
   setHint('scan');
 }
