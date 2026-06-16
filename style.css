@@ -198,8 +198,6 @@ body {
 #arOverlay {
   position: fixed;
   inset: 0;
-  display: flex;
-  flex-direction: column;
   pointer-events: none;
   z-index: 10;
 }
@@ -207,10 +205,12 @@ body {
 #arOverlay[hidden] { display: none; }
 
 .ar-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(12px + var(--safe-t)) 16px 12px;
+  padding: calc(12px + var(--safe-t)) 16px 20px;
   background: linear-gradient(to bottom, rgba(0,0,0,.55), transparent);
   pointer-events: auto;
 }
@@ -240,10 +240,10 @@ body {
 
 /* ── AR hint ──────────────────────────────────────────────────────────────── */
 .ar-hint-wrap {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   pointer-events: none;
 }
 
@@ -272,7 +272,8 @@ body {
 
 /* ── AR bottom ────────────────────────────────────────────────────────────── */
 .ar-bottom {
-  flex-shrink: 0;
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
   padding: 16px 16px calc(28px + var(--safe-b));
   display: flex;
   flex-direction: column;
