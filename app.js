@@ -63,15 +63,17 @@ function initThree() {
   scene  = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 200);
 
-  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, premultipliedAlpha: false });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0x000000, 0);
+  renderer.autoClear = true;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
 
   Object.assign(renderer.domElement.style, {
     position: 'fixed', inset: '0', width: '100%', height: '100%', zIndex: '2',
+    background: 'transparent',
   });
   document.body.appendChild(renderer.domElement);
 
@@ -161,6 +163,7 @@ async function startCameraAR() {
   // Video element as background
   const video = document.createElement('video');
   video.setAttribute('playsinline', '');
+  video.setAttribute('autoplay', '');
   video.muted = true;
   Object.assign(video.style, {
     position: 'fixed', inset: '0', width: '100%', height: '100%',
@@ -198,8 +201,8 @@ function onDeviceOrientation(e) {
 }
 
 function onDocumentTap(e) {
-  // Ignore taps on UI buttons
-  if (e.target.closest('#exitBtn, #replaceBtn')) return;
+  if (isPlaced) return;
+  if (e.target.closest('#exitBtn, #replaceBtn, #placeBtn')) return;
   onCameraTap();
 }
 
