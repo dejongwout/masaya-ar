@@ -196,18 +196,27 @@ function onDeviceOrientation(e) {
 }
 
 function onCameraTap() {
-  // Cast ray from camera through scene, find y = 0 ground intersection
   const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-  if (Math.abs(forward.y) < 0.05) return; // looking too horizontally
-  const t = -camera.position.y / forward.y;
-  if (t < 0.5 || t > 25) return; // too close or too far
 
-  const groundPt = camera.position.clone().addScaledVector(forward, t);
+  // Try ground-plane intersection first
+  let groundPt;
+  if (Math.abs(forward.y) > 0.05) {
+    const t = -camera.position.y / forward.y;
+    if (t > 0.5 && t < 25) {
+      groundPt = camera.position.clone().addScaledVector(forward, t);
+    }
+  }
+
+  // Fallback: 4 m straight ahead at ground level
+  if (!groundPt) {
+    const horiz = forward.clone(); horiz.y = 0; horiz.normalize();
+    groundPt = camera.position.clone().addScaledVector(horiz, 4);
+    groundPt.y = 0;
+  }
 
   disposeModel(placedModel);
   placedModel = buildADUModel(selectedModel);
   placedModel.position.copy(groundPt);
-  // Face model toward camera
   placedModel.rotation.y = Math.atan2(
     camera.position.x - groundPt.x,
     camera.position.z - groundPt.z
