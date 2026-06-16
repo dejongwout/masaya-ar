@@ -182,7 +182,7 @@ async function startCameraAR() {
 
   showARUI(selectedModel.name);
   setHint('tapAnywhere');
-  renderer.domElement.addEventListener('click', onCameraTap);
+  document.addEventListener('touchend', onDocumentTap, { passive: true });
   renderer.setAnimationLoop(() => renderer.render(scene, camera));
 }
 
@@ -193,6 +193,12 @@ function onDeviceOrientation(e) {
   camera.rotation.y = R(-(e.alpha ?? 0));
   camera.rotation.x = R((e.beta  ?? 90) - 90);
   camera.rotation.z = R(-(e.gamma ?? 0));
+}
+
+function onDocumentTap(e) {
+  // Ignore taps on UI buttons
+  if (e.target.closest('#exitBtn, #replaceBtn')) return;
+  onCameraTap();
 }
 
 function onCameraTap() {
@@ -382,6 +388,7 @@ function onExit() {
 function onSessionEnd() {
   renderer?.setAnimationLoop(null);
   window.removeEventListener('deviceorientation', onDeviceOrientation);
+  document.removeEventListener('touchend', onDocumentTap);
   orbitControls?.dispose(); orbitControls = null;
   disposeModel(placedModel); placedModel = null;
   cameraStream?.getTracks().forEach(t => t.stop()); cameraStream = null;
