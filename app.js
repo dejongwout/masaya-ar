@@ -116,8 +116,8 @@ async function onStart() {
 
   try {
     xrSession = await navigator.xr.requestSession('immersive-ar', {
-      requiredFeatures: ['hit-test'],
-      optionalFeatures: ['dom-overlay'],
+      requiredFeatures: [],
+      optionalFeatures: ['hit-test', 'dom-overlay'],
       domOverlay: { root: document.getElementById('arOverlay') },
     });
   } catch {
@@ -130,8 +130,11 @@ async function onStart() {
   await renderer.xr.setSession(xrSession);
   xrSession.addEventListener('end', onSessionEnd);
 
-  const viewerSpace = await xrSession.requestReferenceSpace('viewer');
-  hitTestSource = await xrSession.requestHitTestSource({ space: viewerSpace });
+  // hit-test is optional — works on ARCore/ARKit, skips gracefully if not supported
+  try {
+    const viewerSpace = await xrSession.requestReferenceSpace('viewer');
+    hitTestSource = await xrSession.requestHitTestSource({ space: viewerSpace });
+  } catch { /* hit-test unavailable — tap placement falls back to fixed distance */ }
 
   showARUI(selectedModel.name);
   renderer.domElement.addEventListener('click', onARTap);
@@ -140,18 +143,22 @@ async function onStart() {
 
 // ── AR render loop ─────────────────────────────────────────────────────────────
 function renderFrame(_, frame) {
-  if (frame && hitTestSource) {
-    const refSpace = renderer.xr.getReferenceSpace();
-    const results  = frame.getHitTestResults(hitTestSource);
-
-    if (results.length > 0 && !isPlaced) {
-      const pose = results[0].getPose(refSpace);
-      reticle.visible = true;
-      reticle.matrix.fromArray(pose.transform.matrix);
-      setHint('tap');
-    } else if (!isPlaced) {
-      reticle.visible = false;
-      setHint('scan');
+  if (frame) {
+    if (hitTestSource && !isPlaced) {
+      const refSpace = renderer.xr.getReferenceSpace();
+      const results  = frame.getHitTestResults(hitTestSource);
+      if (results.length > 0) {
+        const pose = results[0].getPose(refSpace);
+        reticle.visible = true;
+        reticle.matrix.fromArray(pose.transform.matrix);
+        setHint('tap');
+      } else {
+        reticle.visible = false;
+        setHint('scan');
+      }
+    } else if (!hitTestSource && !isPlaced) {
+      // No hit-test: prompt tap-anywhere placement
+      setHint('tapAnywhere');
     }
   }
   renderer.render(scene, camera);
@@ -159,17 +166,30 @@ function renderFrame(_, frame) {
 
 // ── Tap to place ───────────────────────────────────────────────────────────────
 function onARTap() {
-  if (!reticle.visible) return;
+  // With hit-test: must wait for reticle
+  if (hitTestSource && !reticle.visible) return;
 
   disposeModel(placedModel);
   placedModel = buildADUModel(selectedModel);
 
-  const pos  = new THREE.Vector3();
-  const quat = new THREE.Quaternion();
-  reticle.matrix.decompose(pos, quat, new THREE.Vector3());
-  placedModel.position.copy(pos);
-  // Keep model upright — only carry yaw from surface orientation
-  placedModel.rotation.y = new THREE.Euler().setFromQuaternion(quat).y;
+  if (reticle.visible) {
+    // Place at hit-test surface point
+    const pos  = new THREE.Vector3();
+    const quat = new THREE.Quaternion();
+    reticle.matrix.decompose(pos, quat, new THREE.Vector3());
+    placedModel.position.copy(pos);
+    placedModel.rotation.y = new THREE.Euler().setFromQuaternion(quat).y;
+  } else {
+    // Fallback: project 3 m in front of camera onto y = 0 ground plane
+    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+    forward.y = 0;
+    forward.normalize();
+    const camPos = new THREE.Vector3();
+    camera.getWorldPosition(camPos);
+    placedModel.position.copy(camPos).addScaledVector(forward, 3);
+    placedModel.position.y = 0;
+  }
+
   scene.add(placedModel);
 
   isPlaced = true;
@@ -291,8 +311,11 @@ function setHint(type) {
   if (type === 'scan') {
     hint.textContent = 'Move slowly to detect the ground';
     hint.classList.remove('ready');
-  } else {
+  } else if (type === 'tap') {
     hint.textContent = 'Tap to place';
+    hint.classList.add('ready');
+  } else if (type === 'tapAnywhere') {
+    hint.textContent = 'Tap to place in front of you';
     hint.classList.add('ready');
   }
 }
