@@ -310,3 +310,25 @@ body {
 }
 
 .ar-action-btn:active { opacity: .75; }
+
+.ar-place-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #fff;
+  color: #0a0a0a;
+  -webkit-text-fill-color: #0a0a0a;
+  border: none;
+  border-radius: 980px;
+  padding: 14px 28px;
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,.35);
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .1s, opacity .1s;
+}
+.ar-place-btn:active { transform: scale(.96); opacity: .85; }

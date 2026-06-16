@@ -22,6 +22,7 @@ function init() {
   document.getElementById('startBtn').addEventListener('click', onStart);
   document.getElementById('exitBtn').addEventListener('click', onExit);
   document.getElementById('replaceBtn').addEventListener('click', onReplace);
+  document.getElementById('placeBtn').addEventListener('click', onCameraTap);
 }
 
 // ── Model list ─────────────────────────────────────────────────────────────────
@@ -287,6 +288,7 @@ function onReplace() {
   document.getElementById('arHintWrap').style.display = '';
   document.getElementById('arDims').hidden    = true;
   document.getElementById('arActions').hidden = true;
+  document.getElementById('placeBtn').hidden  = false;
   setHint(hitTestSource ? 'scan' : 'tapAnywhere');
 }
 
@@ -369,6 +371,7 @@ function showPlacedUI() {
   document.getElementById('arDims').hidden    = false;
   document.getElementById('arDims').textContent = dimsLabel(selectedModel);
   document.getElementById('arActions').hidden = false;
+  document.getElementById('placeBtn').hidden  = true;
 }
 
 function setHint(type) {
@@ -402,6 +405,7 @@ function onSessionEnd() {
   document.getElementById('arHintWrap').style.display = '';
   document.getElementById('arDims').hidden            = true;
   document.getElementById('arActions').hidden         = true;
+  document.getElementById('placeBtn').hidden          = false;
 }
 
 function cleanupThree() {
