@@ -53,11 +53,20 @@ function selectModel(model) {
 
 // ── AR support check ───────────────────────────────────────────────────────────
 async function checkARSupport() {
-  if (!navigator.xr) { setNote('Use Chrome or Safari on a recent mobile device for AR.'); return; }
-  const ok = await navigator.xr.isSessionSupported('immersive-ar').catch(() => false);
-  if (!ok) {
+  if (!navigator.xr) {
     document.querySelector('#startBtn .btn-label').textContent = 'Preview in 3D';
-    setNote('AR not available on this device — showing 3D preview instead.');
+    setNote('No WebXR. Use Chrome on Android or Safari on iOS 16.4+.');
+    return;
+  }
+  const ok = await navigator.xr.isSessionSupported('immersive-ar').catch(e => {
+    setNote(`Support check failed: ${e.message}`);
+    return false;
+  });
+  if (ok) {
+    setNote('AR ready — tap to open camera.');
+  } else {
+    document.querySelector('#startBtn .btn-label').textContent = 'Preview in 3D';
+    setNote('immersive-ar not supported. iPhone: Settings → Safari → Advanced → Experimental Features → WebXR Device API → ON.');
   }
 }
 
