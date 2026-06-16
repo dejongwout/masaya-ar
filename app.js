@@ -66,7 +66,6 @@ function initThree() {
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.xr.enabled        = true;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
 
@@ -109,6 +108,7 @@ async function onStart() {
 
 async function tryWebXR() {
   initThree();
+  renderer.xr.enabled = true;
 
   const overlay = document.getElementById('arOverlay');
   overlay.hidden = false;
@@ -329,10 +329,12 @@ function buildADUModel(config) {
   wall.castShadow = wall.receiveShadow = true;
   group.add(wall);
 
-  group.add(Object.assign(
-    new THREE.LineSegments(new THREE.EdgesGeometry(wallGeo), new THREE.LineBasicMaterial({ color: 0xbdb4aa })),
-    { position: { y: H / 2 } }
-  ));
+  const wallEdges = new THREE.LineSegments(
+    new THREE.EdgesGeometry(wallGeo),
+    new THREE.LineBasicMaterial({ color: 0xbdb4aa })
+  );
+  wallEdges.position.y = H / 2;
+  group.add(wallEdges);
 
   const roof = new THREE.Mesh(
     new THREE.BoxGeometry(W + OV * 2, RT, D + OV * 2),
