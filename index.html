@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>AR — Masaya Homes</title>
+  <link rel="icon" href="https://framerusercontent.com/images/ioXIs8nomjJzesaJAWk53YzTs7g.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.167.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.167.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- ── Home screen ──────────────────────────────────────────────────────── -->
+  <div id="home" class="screen">
+
+    <header class="app-header">
+      <div class="logo-row">
+        <svg class="app-icon" viewBox="0 0 100 100" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+          <path style="fill:#fff;stroke:rgba(255,255,255,.2);stroke-width:4" d="M50 2 C11.6 2 2 11.6 2 50 C2 88.4 11.6 98 50 98 C88.4 98 98 88.4 98 50 C98 11.6 88.4 2 50 2 Z"/>
+          <path fill="#0a0a0a" d="M77.35 47.82 L57.32 49.22 L72.48 36.12 L66.18 29.84 L52.99 44.96 L54.4 25.01 L45.6 25.01 L47.01 44.96 L33.82 29.84 L27.52 36.12 L42.68 49.22 L22.65 47.82 L22.69 56.66 L47.18 54.94 L45.54 74.99 L54.45 74.99 L52.83 54.94 L77.35 56.66 Z"/>
+        </svg>
+        <span class="app-name">Masaya <span class="app-name-ar">AR</span></span>
+      </div>
+      <p class="tagline">See your ADU in your backyard — to scale.</p>
+    </header>
+
+    <div class="model-list" id="modelList"></div>
+
+    <div class="home-footer">
+      <button class="start-btn" id="startBtn">
+        <span class="btn-label">View in backyard</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+      <p class="ar-note" id="arNote"></p>
+    </div>
+
+  </div>
+
+  <!-- ── AR / Preview overlay ─────────────────────────────────────────────── -->
+  <div id="arOverlay" hidden>
+
+    <div class="ar-top">
+      <button class="ar-exit-btn" id="exitBtn" aria-label="Exit">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <span class="ar-model-name" id="arModelName"></span>
+      <div style="width:40px"></div>
+    </div>
+
+    <div class="ar-hint-wrap" id="arHintWrap">
+      <div class="ar-hint" id="arHint">Move slowly to detect the ground</div>
+    </div>
+
+    <div class="ar-bottom">
+      <div class="ar-dims" id="arDims" hidden></div>
+      <div class="ar-actions" id="arActions" hidden>
+        <button class="ar-action-btn" id="replaceBtn">Re-place</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

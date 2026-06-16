@@ -1,0 +1,291 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #0a0a0a;
+  --surface: #141414;
+  --border:  rgba(255,255,255,.1);
+  --text:    #ffffff;
+  --muted:   rgba(255,255,255,.45);
+  --accent:  #ffffff;
+  --font:    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --radius:  12px;
+  --safe-b:  env(safe-area-inset-bottom, 0px);
+  --safe-t:  env(safe-area-inset-top, 0px);
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ── Screens ──────────────────────────────────────────────────────────────── */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Home ─────────────────────────────────────────────────────────────────── */
+.app-header {
+  padding: calc(24px + var(--safe-t)) 24px 20px;
+  flex-shrink: 0;
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.app-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+
+.app-name-ar {
+  font-size: .75rem;
+  font-weight: 500;
+  background: var(--text);
+  color: var(--bg);
+  border-radius: 4px;
+  padding: 1px 5px;
+  letter-spacing: .04em;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+.tagline {
+  font-size: .9375rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ── Model list ───────────────────────────────────────────────────────────── */
+.model-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: none;
+}
+.model-list::-webkit-scrollbar { display: none; }
+
+.model-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.model-card.selected {
+  border-color: rgba(255,255,255,.6);
+  background: rgba(255,255,255,.05);
+}
+
+.model-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.model-name {
+  display: block;
+  font-size: .9375rem;
+  font-weight: 500;
+}
+
+.model-meta {
+  display: block;
+  font-size: .8125rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.model-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background .15s, border-color .15s;
+}
+
+.model-card.selected .model-check {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+}
+
+.model-card:not(.selected) .model-check svg { display: none; }
+
+/* ── Home footer ──────────────────────────────────────────────────────────── */
+.home-footer {
+  flex-shrink: 0;
+  padding: 16px 16px calc(16px + var(--safe-b));
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.start-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--text);
+  color: var(--bg);
+  -webkit-text-fill-color: var(--bg);
+  border: none;
+  border-radius: 980px;
+  padding: 16px 24px;
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.start-btn:active { opacity: .8; }
+
+.ar-note {
+  text-align: center;
+  font-size: .8125rem;
+  color: var(--muted);
+  min-height: 1.2em;
+}
+
+/* ── AR overlay ───────────────────────────────────────────────────────────── */
+#arOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#arOverlay[hidden] { display: none; }
+
+.ar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(12px + var(--safe-t)) 16px 12px;
+  background: linear-gradient(to bottom, rgba(0,0,0,.55), transparent);
+  pointer-events: auto;
+}
+
+.ar-exit-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ar-model-name {
+  font-size: .875rem;
+  font-weight: 500;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,.5);
+}
+
+/* ── AR hint ──────────────────────────────────────────────────────────────── */
+.ar-hint-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.ar-hint {
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #fff;
+  font-size: .875rem;
+  font-family: var(--font);
+  padding: 10px 20px;
+  border-radius: 980px;
+  white-space: nowrap;
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .55; }
+}
+
+.ar-hint.ready {
+  animation: none;
+  opacity: 1;
+}
+
+/* ── AR bottom ────────────────────────────────────────────────────────────── */
+.ar-bottom {
+  flex-shrink: 0;
+  padding: 16px 16px calc(28px + var(--safe-b));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(to top, rgba(0,0,0,.55), transparent);
+  pointer-events: none;
+}
+
+.ar-dims {
+  font-size: .9375rem;
+  font-weight: 500;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,.6);
+}
+
+.ar-actions {
+  pointer-events: auto;
+}
+
+.ar-action-btn {
+  background: rgba(255,255,255,.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(255,255,255,.3);
+  border-radius: 980px;
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+  font-family: var(--font);
+  font-size: .875rem;
+  font-weight: 500;
+  padding: 10px 22px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ar-action-btn:active { opacity: .75; }
